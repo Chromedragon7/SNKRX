@@ -1,0 +1,11 @@
+{
+  "name": "SNKRX Roblox Port",
+  "tree": {
+    "$className": "DataModel",
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "SNKRXPort": { "$path": "dist/src" }
+      }
+    }
+  }
+}
