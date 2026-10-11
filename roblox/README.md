@@ -7,11 +7,11 @@ under `roblox/`; the original game's source files have not been rewritten.
 ## Play
 
 Open [`dist/SNKRX.rbxlx`](dist/SNKRX.rbxlx) in Roblox Studio and press **Play**.
-Choose **arena run**, click heroes to buy them, then choose **GO!**.
+Choose **LET'S PLAY**, use **RECRUIT** to buy heroes, then choose **BATTLE**.
 Steer with **A/D**, **left/right arrows**, or **D-pad**. **P** pauses.
 Touch steering buttons appear on touch devices (touch interaction is not yet
-device-tested). The shop supports 1/2/3 purchases, right-click selling, and the
-small arrows beside each party member to change its position.
+device-tested). The shop supports 1/2/3 purchases. Select a team member to see their ability,
+sell them, or move them earlier/later in the squad.
 
 The current build is deliberately labeled a **preview**: eight tier-one heroes
 and the first two arenas. It ends with a completion screen, not an invented
@@ -36,10 +36,11 @@ for manual model import into `StarterPlayerScripts`.
   movement speed, 10.4-unit following distance, and wall reflection remain.
 - Three-card shop, 3 starting gold, 2-gold rerolls, seven distinct heroes,
   3/9-copy upgrades, reserve sale values, locked cards, rewards and interest.
-- The original minimalist menu arrangement: shop left, classes in the middle,
-  party at right, hover descriptions, compact icons and green GO button. The
-  title uses the original FatPixelFont lettering. A full-screen background
-  covers the area behind Roblox's top bar.
+- A redesigned, colorful Roblox interface requested by the owner: rounded hero
+  cards with friendly faces, explicit recruit buttons, visible gold and team
+  panels, discoverable hero management, team bonuses, and simple onboarding.
+  The full-screen blue/purple background covers Roblox's top bar area.
+
 
 **Preserved data does not mean all corresponding behavior is implemented.**
 See [PORT_STATUS.md](PORT_STATUS.md) for the current gaps and exact deviations.

@@ -7,7 +7,7 @@ local ContextActionService = game:GetService(&quot;ContextActionService&quot;)
 local TweenService = game:GetService(&quot;TweenService&quot;)
 local GuiService = game:GetService(&quot;GuiService&quot;)
 local StarterGui = game:GetService(&quot;StarterGui&quot;)
-local TitleGlyphs = require(script.Parent:WaitForChild(&quot;TitleGlyphs&quot;))
+
 local Data = require(script.Parent:WaitForChild(&quot;SourceData&quot;))
 local Rules = require(script.Parent:WaitForChild(&quot;Rules&quot;))
 local Run = require(script.Parent:WaitForChild(&quot;Run&quot;))
@@ -33,6 +33,7 @@ for _, kind in ipairs({Enum.CoreGuiType.Backpack,Enum.CoreGuiType.PlayerList,Enu
 end
 local palette = {}
 for key, value in pairs(Rules.Palette) do palette[key] = Color3.fromHex(value) end
+for key,value in pairs({bg=&quot;101C39&quot;,fg=&quot;F5F8FF&quot;,panel=&quot;203458&quot;,muted=&quot;B6C7E6&quot;,mint=&quot;72F4CC&quot;,pink=&quot;FF79BC&quot;,sky=&quot;69D9FF&quot;}) do palette[key]=Color3.fromHex(value) end
 local function make(class, properties, parent)
  local item = Instance.new(class)
  for key,value in pairs(properties) do item[key] = value end
@@ -40,6 +41,8 @@ local function make(class, properties, parent)
  return item
 end
 local bg = make(&quot;Frame&quot;,{Name=&quot;Background&quot;,Size=UDim2.fromScale(1,1),BackgroundColor3=palette.bg,BorderSizePixel=0},gui)
+bg.BackgroundColor3=Color3.new(1,1,1)
+make(&quot;UIGradient&quot;,{Color=ColorSequence.new(Color3.fromHex(&quot;244B73&quot;),Color3.fromHex(&quot;392752&quot;)),Rotation=30},bg)
 local stage = make(&quot;Frame&quot;,{Name=&quot;Stage&quot;,AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(480,270),BackgroundTransparency=1},bg)
 local scale = make(&quot;UIScale&quot;,{Scale=1},stage)
 local function resize()
@@ -54,18 +57,19 @@ local function frame(parent,name,x,y,w,h,color)
 end
 local function text(parent,name,label,x,y,w,h,size,color)
  return make(&quot;TextLabel&quot;,{Name=name,Text=label,Position=UDim2.fromOffset(x,y),Size=UDim2.fromOffset(w,h),BackgroundTransparency=1,
-  TextColor3=palette[color] or palette.fg,Font=Enum.Font.Code,TextSize=size,TextWrapped=true,TextXAlignment=Enum.TextXAlignment.Left},parent)
+  TextColor3=palette[color] or palette.fg,Font=Enum.Font.GothamMedium,TextSize=size,TextWrapped=true,TextXAlignment=Enum.TextXAlignment.Left},parent)
 end
 local function button(parent,name,label,x,y,w,h,callback,color)
- local b = make(&quot;TextButton&quot;,{Name=name,Text=label,Position=UDim2.fromOffset(x,y),Size=UDim2.fromOffset(w,h),BackgroundColor3=Color3.fromHex(&quot;414141&quot;),
-  BorderSizePixel=0,TextColor3=palette[color] or palette.fg,Font=Enum.Font.Code,TextSize=10,TextWrapped=true,AutoButtonColor=false},parent)
- make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,3)},b)
+ local b = make(&quot;TextButton&quot;,{Name=name,Text=label,Position=UDim2.fromOffset(x,y),Size=UDim2.fromOffset(w,h),BackgroundColor3=palette.panel,
+  BorderSizePixel=0,TextColor3=palette[color] or palette.fg,Font=Enum.Font.GothamMedium,TextSize=10,TextWrapped=true,AutoButtonColor=false},parent)
+ make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,7)},b)
+ make(&quot;UIStroke&quot;,{ApplyStrokeMode=Enum.ApplyStrokeMode.Border,Color=Color3.fromHex(&quot;496185&quot;),Thickness=1,Transparency=0.35},b)
  local bounce=make(&quot;UIScale&quot;,{Scale=1},b)
  local normal, normalBackground=b.TextColor3,b.BackgroundColor3
  b.MouseEnter:Connect(function()
   normal,normalBackground=b.TextColor3,b.BackgroundColor3
   b.BackgroundColor3=palette.fg;b.TextColor3=palette.bg
-  TweenService:Create(bounce,TweenInfo.new(0.18,Enum.EasingStyle.Back),{Scale=1.05}):Play()
+  TweenService:Create(bounce,TweenInfo.new(0.18,Enum.EasingStyle.Back),{Scale=1.025}):Play()
  end)
  b.MouseLeave:Connect(function()
   b.BackgroundColor3=normalBackground;b.TextColor3=normal
@@ -76,7 +80,12 @@ local function button(parent,name,label,x,y,w,h,callback,color)
 end
 local screen = frame(stage,&quot;Menus&quot;,0,0,480,270,&quot;bg&quot;)
 local arena = frame(stage,&quot;Arena&quot;,48,27,384,216,&quot;bg&quot;)
-arena.BackgroundColor3 = Color3.fromHex(&quot;383838&quot;)
+arena.BackgroundColor3 = Color3.fromHex(&quot;142943&quot;)
+make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,9)},arena)
+make(&quot;UIStroke&quot;,{Color=palette.sky,Thickness=1,Transparency=0.55},arena)
+for x=16,380,16 do for y=16,212,16 do
+ local dot=frame(arena,&quot;Grid&quot;,x,y,1,1,&quot;sky&quot;);dot.BackgroundTransparency=0.87
+end end
 arena.Visible = false
 local actors = frame(stage,&quot;Actors&quot;,0,0,480,270,&quot;bg&quot;); actors.BackgroundTransparency=1; actors.Visible=false
 local hud = text(stage,&quot;HUD&quot;,&quot;&quot;,48,5,310,18,10,&quot;fg&quot;)
@@ -84,7 +93,9 @@ local waveText = text(stage,&quot;Wave&quot;,&quot;&quot;,355,5,78,18,9,&quot;ye
 local help = text(stage,&quot;Help&quot;,&quot;&quot;,48,248,384,16,8,&quot;fg&quot;)
 local pauseButton = button(stage,&quot;Pause&quot;,&quot;pause&quot;,434,4,40,18,function() if sim and run.phase==&quot;arena&quot; then sim.paused=not sim.paused end end)
 pauseButton.Visible=false
-local pauseOverlay = frame(stage,&quot;PauseOverlay&quot;,125,90,230,85,&quot;bg&quot;); pauseOverlay.Visible=false
+local pauseOverlay = frame(stage,&quot;PauseOverlay&quot;,125,90,230,85,&quot;panel&quot;); pauseOverlay.Visible=false
+make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,12)},pauseOverlay)
+pauseOverlay.ZIndex=20
 text(pauseOverlay,&quot;Title&quot;,&quot;paused&quot;,16,10,200,24,20,&quot;yellow&quot;)
 button(pauseOverlay,&quot;Resume&quot;,&quot;resume&quot;,16,46,92,24,function() if sim then sim.paused=false end end)
 button(pauseOverlay,&quot;Restart&quot;,&quot;new run&quot;,122,46,92,24,function() sim=nil; run=Run.new(randomInt) end)
@@ -137,90 +148,139 @@ local function classBadge(parent,class,x,y,count,active)
  end
  return tile
 end
+local showBonuses=false
+local selectedParty
+local roles={vagrant=&quot;Adventure buddy&quot;,swordsman=&quot;Close-up fighter&quot;,magician=&quot;Magic blaster&quot;,archer=&quot;Long-range shots&quot;,scout=&quot;Bouncing knives&quot;,cleric=&quot;Team healer&quot;,arcanist=&quot;Orbiting magic&quot;,merchant=&quot;Gold collector&quot;}
+local shortHelp={vagrant=&quot;Shoots nearby enemies.&quot;,swordsman=&quot;Hits a crowd at once.&quot;,magician=&quot;Blasts enemies with magic.&quot;,archer=&quot;Arrows pierce enemies.&quot;,scout=&quot;Knives jump between foes.&quot;,cleric=&quot;Drops healing for your team.&quot;,arcanist=&quot;Magic orbs fire extra bolts.&quot;,merchant=&quot;Earns bonus gold interest.&quot;}
+local function rounded(parent,name,x,y,w,h,color)
+ local f=frame(parent,name,x,y,w,h,color)
+ make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,10)},f)
+ return f
+end
+local function bold(parent,name,label,x,y,w,h,size,color)
+ local t=text(parent,name,label,x,y,w,h,size,color);t.Font=Enum.Font.GothamBold;return t
+end
+local function heroFace(parent,character,x,y,size)
+ local color=Data.Colors[character]
+ local f=rounded(parent,&quot;Hero&quot;,x,y,size,size,color)
+ make(&quot;UIGradient&quot;,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(150,175,205)),Rotation=90},f)
+ local shine=rounded(f,&quot;Shine&quot;,size*.12,size*.08,size*.76,size*.18,&quot;fg&quot;);shine.BackgroundTransparency=.78
+ for _,ex in ipairs({.28,.65}) do
+  local eye=rounded(f,&quot;Eye&quot;,size*ex,size*.42,size*.14,size*.21,&quot;fg&quot;)
+  rounded(eye,&quot;Pupil&quot;,size*.045,size*.06,size*.075,size*.12,&quot;bg&quot;)
+ end
+ local smile=rounded(f,&quot;Smile&quot;,size*.42,size*.74,size*.22,size*.06,&quot;bg&quot;)
+ return f
+end
+local function primary(parent,name,label,x,y,w,h,callback)
+ local b=button(parent,name,label,x,y,w,h,callback,&quot;bg&quot;);b.BackgroundColor3=palette.mint;b.Font=Enum.Font.GothamBold;b.TextSize=12;return b
+end
+local function scrim()
+ local shade=make(&quot;TextButton&quot;,{Name=&quot;ModalBackdrop&quot;,Text=&quot;&quot;,AutoButtonColor=false,Size=UDim2.fromScale(1,1),BackgroundColor3=palette.bg,BackgroundTransparency=.16,BorderSizePixel=0,ZIndex=9},screen)
+ return shade
+end
 local function renderMenu()
- screen:ClearAllChildren()
+ screen:ClearAllChildren();screen.BackgroundTransparency=1
  if screenMode==&quot;title&quot; then
-  local title=frame(screen,&quot;Title&quot;,24,82,79,24,&quot;bg&quot;);title.BackgroundTransparency=1
-  for _,r in ipairs(TitleGlyphs) do frame(title,&quot;Glyph&quot;,r[1],r[2],r[3],r[4],&quot;fg&quot;) end
-  button(screen,&quot;ArenaRun&quot;,&quot;arena run&quot;,24,123,96,22,function() screenMode=&quot;shop&quot; end)
-  button(screen,&quot;HowTo&quot;,&quot;how to play&quot;,24,153,96,22,function() infoMode=not infoMode;lastRevision=-1 end)
+  text(screen,&quot;Eyebrow&quot;,&quot;BUILD A TEAM. BECOME A SNAKE.&quot;,26,24,290,16,9,&quot;mint&quot;)
+  bold(screen,&quot;Title&quot;,&quot;SNKRX\nSQUAD UP!&quot;,24,46,250,98,34,&quot;fg&quot;)
+  text(screen,&quot;Subtitle&quot;,&quot;Tiny heroes. Big teamwork.\nRecruit your favorites and take on the arena!&quot;,27,146,224,34,11,&quot;muted&quot;)
+  primary(screen,&quot;ArenaRun&quot;,if #run.party&gt;0 then &quot;CONTINUE  &gt;&quot; else &quot;LET'S PLAY  &gt;&quot;,26,191,162,35,function() screenMode=&quot;shop&quot; end)
+  button(screen,&quot;HowTo&quot;,&quot;How to play&quot;,26,232,162,24,function() infoMode=not infoMode;lastRevision=-1 end)
+  local art=rounded(screen,&quot;HeroArt&quot;,274,28,182,208,&quot;panel&quot;);art.BackgroundColor3=Color3.new(1,1,1)
+  make(&quot;UIGradient&quot;,{Color=ColorSequence.new(Color3.fromHex(&quot;304D80&quot;),Color3.fromHex(&quot;503C75&quot;)),Rotation=45},art)
+  for i,c in ipairs({&quot;cleric&quot;,&quot;archer&quot;,&quot;magician&quot;,&quot;scout&quot;,&quot;swordsman&quot;}) do
+   local f=heroFace(art,c,20+((i-1)%2)*67,19+math.floor((i-1)/2)*54,43);f.Rotation=if i%2==0 then 9 else -8
+  end
+  bold(art,&quot;Tag&quot;,&quot;BETTER TOGETHER&quot;,14,180,156,18,10,&quot;mint&quot;)
+  text(screen,&quot;Credit&quot;,&quot;SNKRX by a327ex · Roblox preview&quot;,275,243,193,16,8,&quot;muted&quot;)
   if infoMode then
-   text(screen,&quot;Instructions&quot;,&quot;Steer with A / D or the arrow keys.\nYour heroes attack automatically.\nBuy matching heroes to level up.\nP pauses the arena.&quot;,154,164,280,65,11,&quot;fg&quot;)
+   scrim()
+   local modal=rounded(screen,&quot;HowToPanel&quot;,88,38,304,194,&quot;panel&quot;);modal.ZIndex=10
+   bold(modal,&quot;Heading&quot;,&quot;Your first adventure&quot;,18,14,266,26,19,&quot;fg&quot;)
+   text(modal,&quot;Steps&quot;,&quot;1   Pick heroes in the shop.\n2   Steer with A / D or arrow keys.\n3   Your squad attacks automatically!\n4   Buy 3 matching heroes to level up.&quot;,18,51,266,92,12,&quot;fg&quot;)
+   primary(modal,&quot;Close&quot;,&quot;GOT IT!&quot;,18,152,268,28,function() infoMode=false;lastRevision=-1 end)
   end
-  local demo=frame(screen,&quot;Demo&quot;,190,42,240,160,&quot;bg&quot;);demo.BackgroundTransparency=1
-  for i,color in ipairs({&quot;purple&quot;,&quot;blue&quot;,&quot;purple&quot;,&quot;red&quot;,&quot;green&quot;,&quot;yellow&quot;,&quot;green&quot;}) do
-   local p=frame(demo,&quot;Segment&quot;..i,0,0,9,9,color);p.AnchorPoint=Vector2.new(0.5,0.5);make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,2)},p)
-  end
-  text(screen,&quot;Credit&quot;,&quot;original game by a327ex&quot;,24,238,244,15,9,&quot;fg&quot;)
-  text(screen,&quot;Preview&quot;,&quot;Roblox preview / 8 heroes / 2 arenas&quot;,24,255,340,10,7,&quot;fg&quot;)
  elseif run.phase==&quot;shop&quot; then
-  -- Layout follows buy_screen.lua: shop left, classes center, party right, GO bottom.
-  text(screen,&quot;ShopTitle&quot;,&quot;shop - gold:&quot;,18,12,102,18,12,&quot;fg&quot;)
-  text(screen,&quot;Gold&quot;,tostring(run.gold),113,12,30,18,12,&quot;yellow&quot;)
-  button(screen,&quot;Reroll&quot;,&quot;reroll: 2&quot;,150,11,65,18,function() if not run:reroll() then run.message=&quot;Reroll costs 2 gold.&quot;;run.revision+=1 end end)
-  button(screen,&quot;Lock&quot;,if run.locked then &quot;locked&quot; else &quot;lock&quot;,223,11,40,18,function() run:toggleLock() end,if run.locked then &quot;yellow&quot; else &quot;fg&quot;)
-  text(screen,&quot;ClassesTitle&quot;,&quot;classes&quot;,295,12,74,18,12,&quot;fg&quot;)
-  text(screen,&quot;PartyTitle&quot;,&quot;party &quot;..#run.party..&quot;/7&quot;,392,12,78,18,12,&quot;fg&quot;)
-  local details=frame(screen,&quot;Details&quot;,18,156,270,67,&quot;bg&quot;);details.BackgroundColor3=Color3.fromHex(&quot;292929&quot;);details.Visible=false;details.ZIndex=5
-  local detailTitle=text(details,&quot;Title&quot;,&quot;&quot;,9,6,252,16,11,&quot;yellow&quot;)
-  local detailBody=text(details,&quot;Body&quot;,&quot;&quot;,9,25,252,36,10,&quot;fg&quot;)
-  local function describe(character,level)
-   details.Visible=true;detailTitle.Text=string.lower(Data.Names[character])..&quot; - Lv.&quot;..level;detailTitle.TextColor3=palette[Data.Colors[character]]
-   detailBody.Text=Rules.Descriptions[character]
-  end
+  bold(screen,&quot;ShopTitle&quot;,&quot;BUILD YOUR SQUAD&quot;,12,3,267,24,20,&quot;fg&quot;)
+  text(screen,&quot;Subtitle&quot;,&quot;Pick a hero. Grow your team. Get ready to battle!&quot;,13,29,310,15,9,&quot;muted&quot;)
+  local wallet=rounded(screen,&quot;Wallet&quot;,357,5,110,30,&quot;panel&quot;)
+  centerLabel(wallet,&quot;Gold&quot;,tostring(run.gold)..&quot;  GOLD&quot;,0,0,110,30,15,&quot;yellow&quot;)
+  rounded(screen,&quot;ShopPanel&quot;,10,49,320,165,&quot;panel&quot;)
+  bold(screen,&quot;Recruit&quot;,&quot;RECRUIT HEROES&quot;,20,55,165,16,10,&quot;sky&quot;)
+  button(screen,&quot;Reroll&quot;,&quot;Refresh · 2 gold&quot;,189,54,91,20,function() if not run:reroll() then run.message=&quot;You need 2 gold to refresh.&quot;;run.revision+=1 end end)
+  button(screen,&quot;Lock&quot;,if run.locked then &quot;Saved&quot; else &quot;Save&quot;,284,54,37,20,function() run:toggleLock() end,if run.locked then &quot;mint&quot; else &quot;fg&quot;)
   for i=1,3 do
+   local x=18+(i-1)*103
    local character=run.cards[i]
-   local x=18+(i-1)*86
+   local card=rounded(screen,&quot;Offer&quot;..i,x,81,98,125,&quot;bg&quot;)
    if character then
-    local card=button(screen,&quot;Card&quot;..i,&quot;&quot;,x,39,80,99,function() run:buy(i) end)
-    card.BackgroundTransparency=1
-    local hero=frame(card,&quot;Hero&quot;,31,6,18,18,Data.Colors[character]);make(&quot;UICorner&quot;,{CornerRadius=UDim.new(0,3)},hero)
-    centerLabel(hero,&quot;Cost&quot;,tostring(Data.Tiers[character]),0,0,18,18,11,&quot;bg&quot;)
-    centerLabel(card,&quot;Name&quot;,string.lower(Data.Names[character]),0,29,80,16,11,Data.Colors[character])
-    local classes=Data.Classes[character]
-    for j,class in ipairs(classes) do classBadge(card,class,40-#classes*11+(j-1)*22,51,0,false) end
-    card.MouseEnter:Connect(function() card.BackgroundColor3=Color3.fromHex(&quot;292929&quot;);card.BackgroundTransparency=0;describe(character,1) end)
-    card.MouseLeave:Connect(function() card.BackgroundTransparency=1;details.Visible=false end)
-    local owned
+    heroFace(card,character,31,8,35)
+    local n=centerLabel(card,&quot;Name&quot;,Data.Names[character],2,47,94,17,12,&quot;fg&quot;);n.Font=Enum.Font.GothamBold
+    centerLabel(card,&quot;Role&quot;,roles[character],2,66,94,13,8,&quot;sky&quot;)
+    centerLabel(card,&quot;Description&quot;,shortHelp[character],6,80,86,20,8,&quot;muted&quot;)
+    local owned=0
     for _,u in ipairs(run.party) do if u.character==character then owned=u.copies end end
-    if owned then centerLabel(card,&quot;Owned&quot;,owned..&quot; owned&quot;,0,87,80,11,7,&quot;fg&quot;) end
+    local buy=primary(card,&quot;Card&quot;..i,(if owned&gt;0 then &quot;UPGRADE&quot; else &quot;RECRUIT&quot;)..&quot; · 1&quot;,5,103,88,18,function() run:buy(i) end);buy.TextSize=9
+    if run.gold&lt;1 then buy.BackgroundColor3=palette.panel;buy.TextColor3=palette.muted end
    else
-    centerLabel(screen,&quot;Purchased&quot;..i,&quot;-&quot;,x,65,80,18,12,&quot;fg&quot;)
+    centerLabel(card,&quot;Check&quot;,&quot;+&quot;,0,20,98,32,29,&quot;mint&quot;)
+    centerLabel(card,&quot;Joined&quot;,&quot;ON YOUR TEAM!&quot;,5,62,88,28,11,&quot;mint&quot;)
    end
   end
-  local levels,counts=Rules.classLevels(run.party)
-  local classes={};for class in pairs(counts) do table.insert(classes,class) end;table.sort(classes)
-  for i,class in ipairs(classes) do
-   local x,y=301+((i-1)%2)*35,47+math.floor((i-1)/2)*48
-   local badge=classBadge(screen,class,x,y,counts[class],(levels[class] or 0)&gt;0)
-   badge.MouseEnter:Connect(function() run.message=class..&quot;: &quot;..counts[class]..&quot; heroes&quot; end)
+  rounded(screen,&quot;PartyPanel&quot;,339,49,129,165,&quot;panel&quot;)
+  bold(screen,&quot;PartyTitle&quot;,&quot;YOUR TEAM  &quot;..#run.party..&quot;/7&quot;,349,56,112,17,10,&quot;fg&quot;)
+  if #run.party==0 then
+   centerLabel(screen,&quot;Empty&quot;,&quot;Your adventure\nstarts here!\n\nRecruit a hero\nto join your squad.&quot;,350,87,107,88,11,&quot;muted&quot;)
   end
   for i,u in ipairs(run.party) do
-   local y=40+(i-1)*23
-   local b=button(screen,&quot;Party&quot;..i,tostring(u.level),425,y,18,18,function() describe(u.character,u.level) end,Data.Colors[u.character])
-   b.BackgroundColor3=palette[Data.Colors[u.character]];b.TextColor3=palette.bg
-   for j=1,u.copies-(if u.level==3 then 9 elseif u.level==2 then 3 else 1) do frame(screen,&quot;Reserve&quot;,447+((j-1)%3)*5,y+3+math.floor((j-1)/3)*6,3,3,Data.Colors[u.character]) end
-   b.MouseEnter:Connect(function() describe(u.character,u.level) end)
-   b.MouseLeave:Connect(function() details.Visible=false end)
-   b.MouseButton2Click:Connect(function() run:sell(i) end)
-   button(screen,&quot;Up&quot;..i,&quot;&lt;&quot;,392,y,12,18,function() run:move(i,-1) end)
-   button(screen,&quot;Down&quot;..i,&quot;&gt;&quot;,406,y,12,18,function() run:move(i,1) end)
+   local y=78+(i-1)*18
+   local b=button(screen,&quot;Party&quot;..i,&quot;&quot;,346,y,115,16,function() selectedParty=i;lastRevision=-1 end)
+   rounded(b,&quot;Color&quot;,4,3,10,10,Data.Colors[u.character])
+   text(b,&quot;Name&quot;,Data.Names[u.character],18,0,72,16,9,&quot;fg&quot;)
+   text(b,&quot;Level&quot;,&quot;L&quot;..u.level,94,0,20,16,9,&quot;mint&quot;)
   end
-  if #run.party==0 then text(screen,&quot;Empty&quot;,&quot;click a hero\nto recruit&quot;,390,45,80,35,9,&quot;fg&quot;) end
-  text(screen,&quot;ItemsTitle&quot;,&quot;items&quot;,18,142,65,14,12,&quot;fg&quot;)
-  if #run.party==0 then text(screen,&quot;Hint&quot;,&quot;Build your party.\n3 copies = Lv.2   9 copies = Lv.3&quot;,18,174,265,32,10,&quot;fg&quot;) end
-  text(screen,&quot;Message&quot;,run.message,18,224,445,15,9,&quot;yellow&quot;)
-  text(screen,&quot;Level&quot;,&quot;Lv.&quot;..run.arena,287,246,48,19,12,&quot;fg&quot;)
-  local go=button(screen,&quot;Go&quot;,&quot;GO!&quot;,367,244,57,22,enterArena,&quot;green&quot;);go.BackgroundColor3=palette.green;go.TextColor3=palette.bg;go.TextSize=14
-  button(screen,&quot;Back&quot;,&quot;menu&quot;,432,244,37,22,function() screenMode=&quot;title&quot; end)
-  text(screen,&quot;Controls&quot;,&quot;1/2/3 buy  |  right-click party hero to sell&quot;,18,252,259,12,7,&quot;fg&quot;)
+  text(screen,&quot;Message&quot;,run.message,13,217,318,15,9,&quot;yellow&quot;)
+  text(screen,&quot;Tip&quot;,&quot;Tip: 3 matching heroes = a stronger hero!&quot;,13,239,286,15,9,&quot;muted&quot;)
+  button(screen,&quot;Back&quot;,&quot;Home&quot;,12,253,48,17,function() screenMode=&quot;title&quot; end)
+  button(screen,&quot;Bonuses&quot;,&quot;Team bonuses&quot;,69,253,99,17,function() showBonuses=true;lastRevision=-1 end)
+  local go=primary(screen,&quot;Go&quot;,&quot;BATTLE  &quot;..run.arena..&quot;  &gt;&quot;,339,222,129,37,enterArena)
+  if #run.party==0 then go.BackgroundColor3=palette.panel;go.TextColor3=palette.muted end
+  if showBonuses then
+   scrim()
+   local modal=rounded(screen,&quot;BonusesPanel&quot;,74,29,332,211,&quot;panel&quot;);modal.ZIndex=10
+   bold(modal,&quot;Title&quot;,&quot;TEAM BONUSES&quot;,18,12,296,25,18,&quot;fg&quot;)
+   local levels,counts=Rules.classLevels(run.party)
+   local classes={};for class in pairs(counts) do table.insert(classes,class) end;table.sort(classes)
+   for i,class in ipairs(classes) do
+    local x,y=18+((i-1)%3)*101,48+math.floor((i-1)/3)*43
+    classBadge(modal,class,x,y,nil,(levels[class] or 0)&gt;0)
+    text(modal,&quot;ClassName&quot;,class,x+23,y,78,12,8,&quot;fg&quot;)
+    text(modal,&quot;Count&quot;,counts[class]..&quot; heroes&quot;,x+23,y+13,78,12,8,&quot;muted&quot;)
+   end
+   if #classes==0 then centerLabel(modal,&quot;Empty&quot;,&quot;Recruit heroes to discover team bonuses!&quot;,18,62,296,54,13,&quot;muted&quot;) end
+   primary(modal,&quot;Close&quot;,&quot;DONE&quot;,18,174,296,25,function() showBonuses=false;lastRevision=-1 end)
+  end
+  if selectedParty and run.party[selectedParty] then
+   scrim()
+   local index=selectedParty;local u=run.party[index]
+   local modal=rounded(screen,&quot;HeroDetails&quot;,74,37,332,199,&quot;panel&quot;);modal.ZIndex=10
+   heroFace(modal,u.character,17,18,43)
+   bold(modal,&quot;Title&quot;,Data.Names[u.character]..&quot; · Level &quot;..u.level,73,18,246,24,17,&quot;fg&quot;)
+   text(modal,&quot;Copies&quot;,u.copies..&quot; / &quot;..(if u.level==3 then 9 elseif u.level==2 then 9 else 3)..&quot; copies&quot;,74,43,210,16,10,&quot;mint&quot;)
+   text(modal,&quot;Body&quot;,Rules.Descriptions[u.character],18,71,296,46,11,&quot;fg&quot;)
+   button(modal,&quot;Up&quot;,&quot;Move earlier&quot;,18,124,142,25,function() run:move(index,-1);selectedParty=nil end)
+   button(modal,&quot;Down&quot;,&quot;Move later&quot;,172,124,142,25,function() run:move(index,1);selectedParty=nil end)
+   button(modal,&quot;Sell&quot;,&quot;Sell · +&quot;..run:salePrice(index)..&quot; gold&quot;,18,158,142,26,function() run:sell(index);selectedParty=nil end,&quot;pink&quot;)
+   primary(modal,&quot;Close&quot;,&quot;DONE&quot;,172,158,142,26,function() selectedParty=nil;lastRevision=-1 end)
+  end
  else
   local won=run.phase==&quot;complete&quot;
-  text(screen,&quot;Title&quot;,if won then &quot;arenas cleared&quot; else &quot;run ended&quot;,75,48,330,36,26,if won then &quot;yellow&quot; else &quot;red&quot;)
-  text(screen,&quot;Message&quot;,if won then &quot;You finished the first two arenas of the Roblox port. More heroes and arenas are being converted.&quot; else &quot;Your party has fallen. Try a different formation or save gold for upgrades.&quot;,75,96,330,50,12,&quot;fg&quot;)
-  text(screen,&quot;Summary&quot;,&quot;gold: &quot;..run.gold..&quot;   ·   arena: &quot;..run.arena,75,156,330,18,10,&quot;yellow&quot;)
-  button(screen,&quot;NewRun&quot;,&quot;new run&quot;,75,190,150,28,restart)
-  text(screen,&quot;Credits&quot;,&quot;Original game: a327ex · SNKRX · MIT code&quot;,75,239,340,18,8,&quot;fg&quot;)
+  local panel=rounded(screen,&quot;Result&quot;,63,24,354,224,&quot;panel&quot;)
+  centerLabel(panel,&quot;Star&quot;,if won then &quot;★  ★  ★&quot; else &quot;ONE MORE TRY?&quot;,15,18,324,30,26,if won then &quot;yellow&quot; else &quot;pink&quot;)
+  local heading=centerLabel(panel,&quot;Title&quot;,if won then &quot;SQUAD GOALS!&quot; else &quot;You have got this!&quot;,15,60,324,34,25,&quot;fg&quot;);heading.Font=Enum.Font.GothamBold
+  centerLabel(panel,&quot;Message&quot;,if won then &quot;Both preview arenas cleared! More adventures are on the way.&quot; else &quot;Every great squad starts somewhere. Try new heroes and jump back in!&quot;,30,102,294,45,12,&quot;muted&quot;)
+  primary(panel,&quot;NewRun&quot;,&quot;PLAY AGAIN  &gt;&quot;,45,164,264,36,restart)
  end
 end
 local held = {}
@@ -232,6 +292,7 @@ end
 ContextActionService:BindActionAtPriority(&quot;SNKRXSteer&quot;,steer,false,3000,Enum.KeyCode.A,Enum.KeyCode.D,Enum.KeyCode.Left,Enum.KeyCode.Right,Enum.KeyCode.DPadLeft,Enum.KeyCode.DPadRight)
 UserInputService.InputBegan:Connect(function(input,processed)
  if processed then return end
+ if infoMode or showBonuses or selectedParty then return end
  if input.KeyCode==Enum.KeyCode.P and sim and run.phase==&quot;arena&quot; then sim.paused=not sim.paused end
  if input.KeyCode==Enum.KeyCode.Space or input.KeyCode==Enum.KeyCode.Return then
   if screenMode==&quot;title&quot; then screenMode=&quot;shop&quot; elseif run.phase==&quot;shop&quot; then enterArena() end

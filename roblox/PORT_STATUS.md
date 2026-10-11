@@ -8,7 +8,7 @@ This is a working first milestone, not a complete or release-ready port.
 | Original source | Preserved with recorded hashes | Keep reference pinned when making further changes |
 | Roster | All 52 active heroes' catalog data imported; eight tier-one heroes playable | Convert the other 44 heroes before offering them in the shop |
 | Shop | Three offers, buy, upgrade, reserves, sell, lock, reroll, reorder | Preview draws uniformly from tier one; original 70/20/10 starting tier weights are stored but not applied until higher-tier abilities exist. Shop XP/leveling awaits those heroes |
-| Menus | Original spatial layout, compact hero icons, class panel, hover details, original title lettering, green GO button | Body text uses Roblox Code font pending PixulBrush license confirmation. Class icons are code-drawn substitutes. Full options, animated text, credits presentation and drag reordering remain |
+| Menus | Owner-requested colorful redesign: hero cards, friendly portraits, recruitment, gold/team panels, hero management, bonuses and onboarding | Deliberately departs from the original visual layout. Uses Roblox Gotham text and code-drawn art; device QA and full options remain |
 | Movement | Original turning, bounds, average party speed, spacing and bounce | Distance-interpolated fixed-step trail replaces the original 0.01-second sampled trail; tune against original footage |
 | Physics | Local 2D movement, contact damage, knockback, basic separation | Circle contact approximations replace Box2D rotated rectangles and steering forces. This changes feel; do not describe it as exact physics parity |
 | Tier-one combat | Original attack ranges, cooldown multipliers, projectile speed, piercing, chains, square area attacks and per-target Swordsman bonus | More projectile collision comparison; original hit-stop, camera motion, trails and particles remain |
@@ -49,3 +49,5 @@ Level-one Vagrant receives the Explorer bonus including its own active set.
 2. Finish elite enemies/distributed waves and match Box2D collision behavior.
 3. Add items and level-three class interactions, then the full arena/boss loop.
 4. Resolve and import remaining original visual/audio assets, then add saving.
+
+UI redesign validation: Studio title/shop screenshots inspected; recruitment, hero details, team reordering, bonus dialog, and battle entry exercised without console errors. The 24 behavior tests still pass.
