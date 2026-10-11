@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/a327ex/SNKRX",
+  "commit": "6b93a64d694d59472375467648868ae4521d6706",
+  "sha256": {
+    "main.lua": "647c20675e21d20b2c8a1b099ceb183ae6458225a176ff5b139a956dcdedfa27",
+    "player.lua": "99d6ba45c9eae1b51c953ad02aab619c96067c26745517011512e66e83e1b950",
+    "objects.lua": "1e0a3dcf06f0334af6366df44c7392ee09e970b3fb2e99944d67e359704b3920",
+    "arena.lua": "ae7f0fd27d59bbfb9b6ad5002517d8480d2a0e5530198c62f98b36a120228bef",
+    "buy_screen.lua": "73a5ad913156e9b7711ffe146947aaad0834dc2a7c67e82390b94714a6eac97a",
+    "enemies.lua": "bc5d3424187dc708e6c8170ff4fd7279fb641aa71b37840bdde65ca5781805ee",
+    "shared.lua": "505c2748b3b069dea254836133ba185c88579cdeed1ebc66bf5dbc6c979b309f"
+  }
+}
